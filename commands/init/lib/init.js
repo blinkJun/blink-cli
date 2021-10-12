@@ -1,7 +1,6 @@
-'use strict';
-
-module.exports = init;
 
 function init() {
     // TODO
 }
+
+module.exports = init
