@@ -47,7 +47,7 @@ async function exec(packageConfig,...args) {
             args[args.length-1] = params
             
             // 生成执行命令
-            const code = `require('${rootFile}').call(null,${JSON.stringify(args)})`
+            const code = `require('${rootFile}').apply(null,${JSON.stringify(args)})`
 
             log.verbose("执行命令",code)
             

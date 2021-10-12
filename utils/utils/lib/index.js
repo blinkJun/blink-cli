@@ -1,8 +1,9 @@
 
 const cp = require("child_process")
+const fs = require("fs")
+const path = require("path")
 
 const { Spinner } = require("cli-spinner")
-const path = require("path")
 
 const objectTypes = {
     obj: "[object Object]",
@@ -84,10 +85,21 @@ function formatPath(filterPath) {
     return filterPath
 }
 
+// 判断当前执行目录是否为空
+function isCwdEmpty(path){
+    let fileList = fs.readdirSync(path)
+    fileList = fileList.filter(fileName=>{
+        const ignoreList = ["node_modules"]
+        return !fileName.startsWith(".")&&!ignoreList.includes(fileName)
+    })
+    return !fileList||fileList.length<=0
+}
+
 module.exports = {
     execCommand,
     execCommandAsync,
     isObject,
     spinnerStart,
-    formatPath
+    formatPath,
+    isCwdEmpty
 }

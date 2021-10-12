@@ -45,7 +45,8 @@ function registerCommands() {
     // 注册命令
     // 命令1：初始化项目
     program
-        .command("init [projectName]")
+        .command("init")
+        .argument("[projectName]","项目名称")
         .description("初始化项目")
         .option("-f, --force", "是否强制初始化项目，直接删除同名项目", false)
         .action(function (...args) {
