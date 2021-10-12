@@ -1,12 +1,12 @@
 
-const path = require('path')
-const pkgDir = require('pkg-dir')
-const pathExists = require('path-exists')
-const npmInstall = require('npminstall')
-const fse = require('fs-extra')
+const path = require("path")
+const pkgDir = require("pkg-dir")
+const pathExists = require("path-exists")
+const npmInstall = require("npminstall")
+const fse = require("fs-extra")
 
-const { formatPath } = require('@blink-cli/utils')
-const { getDefaultRegistry, getNpmLatestVersion } = require('@blink-cli/get-npm-info')
+const { formatPath } = require("@blink-cli/utils")
+const { getDefaultRegistry, getNpmLatestVersion } = require("@blink-cli/get-npm-info")
 // 模块类
 class Package {
     constructor(options) {
@@ -22,9 +22,9 @@ class Package {
 
         // package的模块名称格式化
         if(this.storePath){
-            this.cachePath = path.resolve(this.storePath, 'node_modules')
+            this.cachePath = path.resolve(this.storePath, "node_modules")
         }
-        this.cachePackagePathPrefix = this.packageConfig.name.replace(/\//g, '_')
+        this.cachePackagePathPrefix = this.packageConfig.name.replace(/\//g, "_")
 
         this.prepare()
     }
@@ -36,7 +36,7 @@ class Package {
             fse.mkdirSync(this.storePath)
         }
         // 将包的版本格式化为具体版本
-        if (this.packageConfig.version === 'latest') {
+        if (this.packageConfig.version === "latest") {
             this.packageConfig.version = await getNpmLatestVersion(this.packageConfig.name)
         }
     }
@@ -105,7 +105,7 @@ class Package {
         const dir = pkgDir.sync(packagePath)
         if (dir) {
             // 读取 package.json
-            const pkgFile = require(path.resolve(dir, 'package.json'))
+            const pkgFile = require(path.resolve(dir, "package.json"))
             // 读取配置的执行文件
             if (pkgFile && pkgFile.main) {
                 // 路径兼容
@@ -117,4 +117,4 @@ class Package {
 }
 
 
-module.exports = Package;
+module.exports = Package

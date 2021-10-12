@@ -1,17 +1,16 @@
-'use strict';
 
-const cp = require('child_process')
+const cp = require("child_process")
 
-const { Spinner } = require('cli-spinner');
-const path = require('path');
+const { Spinner } = require("cli-spinner")
+const path = require("path")
 
 const objectTypes = {
-    obj: '[object Object]',
-    array: '[object Array]',
-    reg: '[object RegExp]',
-    date: '[object Date]',
-    set: '[object Set]',
-    map: '[object Map]'
+    obj: "[object Object]",
+    array: "[object Array]",
+    reg: "[object RegExp]",
+    date: "[object Date]",
+    set: "[object Set]",
+    map: "[object Map]"
 }
 const getObjectType = function (target) {
     return Object.prototype.toString.call(target)
@@ -28,9 +27,9 @@ const isObject = function (target) {
  * @param {String} spinnerString
  * @return {spinnerInstance}
  */
-const spinnerStart = function (spinnerText = '正在加载...', spinnerString = Spinner.spinners[18]) {
+const spinnerStart = function (spinnerText = "正在加载...", spinnerString = Spinner.spinners[18]) {
     const spinnerInstance = new Spinner(`${spinnerText} %s`)
-    spinnerInstance.setSpinnerString(spinnerString);
+    spinnerInstance.setSpinnerString(spinnerString)
     spinnerInstance.start()
     return spinnerInstance
 }
@@ -44,9 +43,9 @@ const spinnerStart = function (spinnerText = '正在加载...', spinnerString = 
  * @return {*} child instance
  */
 const execCommand = function (command, args, options) {
-    const win32 = process.platform === 'win32'
-    const cmd = win32 ? 'cmd' : command
-    const cmdArgs = win32 ? ['/c'].concat(command, args) : args
+    const win32 = process.platform === "win32"
+    const cmd = win32 ? "cmd" : command
+    const cmdArgs = win32 ? ["/c"].concat(command, args) : args
 
     return cp.spawn(cmd, cmdArgs, options || {})
 }
@@ -62,10 +61,10 @@ const execCommand = function (command, args, options) {
 const execCommandAsync = function (command, args, options) {
     return new Promise((resolve, reject) => {
         const child = execCommand(command, args, options)
-        child.on('error', (e) => {
+        child.on("error", (e) => {
             reject(e)
         })
-        child.on('exit', (res) => {
+        child.on("exit", (res) => {
             resolve(res)
         })
     })
@@ -73,13 +72,13 @@ const execCommandAsync = function (command, args, options) {
 
 // 格式化macOS/window上的分隔符
 function formatPath(filterPath) {
-    if (filterPath && typeof filterPath === 'string') {
+    if (filterPath && typeof filterPath === "string") {
         // 查看系统分隔符
         const sep = path.sep
-        if (sep === '/') {
+        if (sep === "/") {
             return filterPath
         } else {
-            return filterPath.replace(/\\/g, '/')
+            return filterPath.replace(/\\/g, "/")
         }
     }
     return filterPath
@@ -91,4 +90,4 @@ module.exports = {
     isObject,
     spinnerStart,
     formatPath
-};
+}

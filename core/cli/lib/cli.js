@@ -1,7 +1,7 @@
-const log = require('@blink-cli/log')
+const log = require("@blink-cli/log")
 
-const prepare = require('./prepare')
-const {registerCommands} = require('./command')
+const prepare = require("./prepare")
+const {registerCommands} = require("./command")
 
 async function cli() {
     try {

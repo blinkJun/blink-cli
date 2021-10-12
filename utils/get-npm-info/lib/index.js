@@ -1,10 +1,9 @@
-'use strict';
-const axios = require('axios')
-const urlJoin = require('url-join')
-const semver = require('semver')
+const axios = require("axios")
+const urlJoin = require("url-join")
+const semver = require("semver")
 
-const defaultRegistry = 'https://registry.npmjs.org'
-const taobaoRegistry = 'https://registry.npm.taobao.org'
+const defaultRegistry = "https://registry.npmjs.org"
+const taobaoRegistry = "https://registry.npm.taobao.org"
 
 // 获取默认的源
 const getDefaultRegistry = function(origin=true){
@@ -69,4 +68,4 @@ module.exports = {
     getNpmGtVersions,
     getNpmLatestVersion,
     getDefaultRegistry
-};
+}
