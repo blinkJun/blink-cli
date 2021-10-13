@@ -1,6 +1,6 @@
 const path = require("path")
 const userHome = require("user-home")
-const pathExists = require("path-exists")
+const fse = require("fs-extra")
 const semver = require("semver")
 const colors = require("colors/safe")
 
@@ -39,9 +39,11 @@ function checkRootAccount() {
 
 // 检查用户主目录是否存在
 function checkUserHomePath() {
-    if (!userHome || !pathExists(userHome)) {
+    if (!userHome || !fse.existsSync(userHome)) {
         throw new Error("当前登录用户目录不存在！")
     }
+    // 存在则配置到全局
+    process.env.USER_HOME = userHome
 }
 
 // 配置环境变量
@@ -56,7 +58,7 @@ function checkEnv() {
     // 检查用户根目录下的环境变量文件
     const envPath = path.resolve(userHome, ".env")
     // 配置到全局环境变量
-    if (pathExists(envPath)) {
+    if (fse.existsSync(envPath)) {
         const dotEnv = require("dotenv")
         dotEnv.config({
             path: envPath

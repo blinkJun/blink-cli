@@ -22,8 +22,11 @@
   "dependencies": {
     "@blink-cli/command": "file:../../models/command",
     "@blink-cli/log": "file:../../utils/log",
+    "@blink-cli/package": "file:../../models/package",
     "@blink-cli/utils": "file:../../utils/utils",
+    "ejs": "^3.1.6",
     "fs-extra": "^10.0.0",
+    "glob": "^7.2.0",
     "inquirer": "^8.2.0",
     "kebab-case": "^1.0.1",
     "semver": "^7.3.5"

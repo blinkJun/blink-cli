@@ -1,7 +1,6 @@
 
 const path = require("path")
 const pkgDir = require("pkg-dir")
-const pathExists = require("path-exists")
 const npmInstall = require("npminstall")
 const fse = require("fs-extra")
 
@@ -12,28 +11,26 @@ class Package {
     constructor(options) {
         const {
             localPath,
-            storePath,
+            targetPath,
             packageConfig
         } = options
 
         this.localPath = localPath
-        this.storePath = storePath
+        this.targetPath = targetPath
         this.packageConfig = packageConfig
 
         // package的模块名称格式化
-        if(this.storePath){
-            this.cachePath = path.resolve(this.storePath, "node_modules")
+        if(this.targetPath){
+            this.cachePath = path.resolve(this.targetPath, "node_modules")
         }
         this.cachePackagePathPrefix = this.packageConfig.name.replace(/\//g, "_")
-
-        this.prepare()
     }
 
     // 直接进行一些准备工作
     async prepare(){
         // 如果传入了缓存目录地址但是未创建则创建一个缓存目录
-        if (this.storePath && !pathExists(this.storePath)) {
-            fse.mkdirSync(this.storePath)
+        if (this.targetPath && !fse.existsSync(this.cachePath)) {
+            fse.mkdirSync(this.cachePath,{recursive:true})
         }
         // 将包的版本格式化为具体版本
         if (this.packageConfig.version === "latest") {
@@ -44,30 +41,32 @@ class Package {
     // 获取缓存模块的具体路径
     get cachePackagePath() {
         const { name, version } = this.packageConfig
-        return path.resolve(this.cachePath, `_${this.cachePackagePathPrefix}@${name}@${version}`)
+        return path.resolve(this.cachePath, `_${this.cachePackagePathPrefix}@${ version}@${name}`)
     }
 
     // 获取具体版本的缓存模块的具体路径
     currentVersionCachePackagePath(version) {
         const { name } = this.packageConfig
-        return path.resolve(this.cachePath, `_${this.cachePackagePathPrefix}@${name}@${version}`)
+        return path.resolve(this.cachePath, `_${this.cachePackagePathPrefix}@${version}@${name}`)
     }
 
     // 是否存在此模块
-    exists() {
-        if (this.storePath) {
-            return pathExists(this.cachePackagePath)
+    async exists() {
+        await this.prepare()
+        if (this.targetPath) {
+            return fse.existsSync(this.cachePackagePath)
         } else {
-            return pathExists(this.localPath)
+            return fse.existsSync(this.localPath)
         }
     }
 
     // 安装此模块
     async install() {
+        await this.prepare()
         // 只会将模块安装到缓存目录
         return npmInstall({
-            root: this.cachePath,
-            storeDir: this.storePath,
+            root:  this.targetPath,
+            storeDir: this.cachePath ,
             registry: getDefaultRegistry(),
             pkgs: [
                 {
@@ -80,13 +79,14 @@ class Package {
 
     // 更新此模块
     async update() {
+        await this.prepare()
         // 获取此模块最新版本号
         const latestVersion = await getNpmLatestVersion(this.packageConfig.name)
         // 是否已经安装此包
-        if (!pathExists(this.currentVersionCachePackagePath(latestVersion))) {
+        if (!fse.existsSync(this.currentVersionCachePackagePath(latestVersion))) {
             return npmInstall({
-                root: this.cachePath,
-                storeDir: this.storePath,
+                root: this.targetPath,
+                storeDir: this.cachePath,
                 registry: getDefaultRegistry(),
                 pkgs: [
                     {

@@ -23,8 +23,7 @@
     "@blink-cli/get-npm-info": "file:../../utils/get-npm-info",
     "@blink-cli/utils": "file:../../utils/utils",
     "fs-extra": "^10.0.0",
-    "npminstall": "^5.1.2",
-    "path-exists": "^4.0.0",
+    "npminstall": "^4.1.1",
     "pkg-dir": "^4.0.0"
   }
 }

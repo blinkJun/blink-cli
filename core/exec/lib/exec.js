@@ -1,5 +1,6 @@
 "use strict"
 const log = require("@blink-cli/log")
+const path = require("path")
 const Package = require("@blink-cli/package")
 const {execCommand} = require("@blink-cli/utils")
 
@@ -15,9 +16,9 @@ async function exec(packageConfig,...args) {
             packageConfig
         })
     }else{
-        const storePath = process.env.CLI_DEPENDENCIES_PATH
+        const targetPath = path.resolve(process.env.USER_HOME,process.env.CLI_DEPENDENCIES_PATH)
         pkg = new Package({
-            storePath,
+            targetPath,
             packageConfig
         })
         if(await pkg.exists()){

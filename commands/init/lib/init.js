@@ -1,13 +1,17 @@
 
 const Command = require("@blink-cli/command")
+const Package = require("@blink-cli/package")
 const log = require("@blink-cli/log")
 const {isCwdEmpty,spinnerStart} = require("@blink-cli/utils")
 const inquirer = require("inquirer")
 const fse = require("fs-extra")
 const semver = require("semver")
 const kebabCase = require("kebab-case")
+const ejs = require("ejs")
+const glob = require("glob")
+const path = require("path")
 
-const {templates} = require("./templates")
+const {templates,TEMPLATE_TYPE_NORMAL,TEMPLATE_TYPE_COSTUM} = require("./templates")
 
 // 最低node版本
 const LOWEST_NODE_VERSION = "12.0.0"
@@ -28,10 +32,18 @@ class InitCommand extends Command {
     async exec(){
         try {
             const prepareSuccess = await this.prepare()
-            if(prepareSuccess){
-                const projectInfo = await this.getProjectInfo()
-                log.verbose(JSON.stringify(projectInfo))
+            if(!prepareSuccess){
+                return false
             }
+            
+            const projectInfo = await this.getProjectInfo()
+            if(!projectInfo){
+                return false
+            }
+            log.verbose("projectInfo",projectInfo)
+            
+            const templatePackage = await this.downloadTemplate(projectInfo)
+            await this.installTemplate(projectInfo,templatePackage)
         } catch (error) {
             log.error(error.message)
         }
@@ -159,6 +171,126 @@ class InitCommand extends Command {
             projectInfo.name = kebabCase(projectInfo.name).replace(/^-/,"")
         }
         return projectInfo
+    }
+
+    // 下载模板
+    async downloadTemplate(projectInfo){
+        const targetPath = path.resolve(process.env.USER_HOME,process.env.CLI_TEMPLATE_PATH)
+        const pkg = new Package({
+            targetPath:targetPath,
+            packageConfig:{
+                name:projectInfo.template.npmName,
+                version:projectInfo.template.version
+            }
+        })
+        if(await pkg.exists()){
+            const spinner = spinnerStart("正在更新模板...")
+            try {
+                await pkg.update()
+            } catch (error) {
+                throw new Error(error.message)
+            } finally{
+                spinner.stop(true)
+                if(await pkg.exists()){
+                    log.success("更新模板成功！")
+                }
+            }
+        }else{
+            const spinner = spinnerStart("正在下载模板...")
+            try {
+                await pkg.install()
+            } catch (error) {
+                throw new Error(error.message)
+            } finally {
+                spinner.stop(true)
+                if(await pkg.exists()){
+                    log.success("下载模板成功！")
+                }
+            }
+        }
+
+        return pkg
+    }
+
+    // 安装模板
+    async installTemplate(projectInfo,templatePackage){
+        log.verbose(templatePackage.packageConfig.type)
+        // 普通模板安装
+        if(projectInfo.template.type === TEMPLATE_TYPE_NORMAL){
+            await this.installNormalTemplate(projectInfo,templatePackage)
+        }
+        // 自定义模板安装
+        if(projectInfo.template.type === TEMPLATE_TYPE_COSTUM){
+            await this.installCustomTemplate(projectInfo,templatePackage)
+        }
+    }
+
+    // 安装普通模板
+    async installNormalTemplate(projectInfo,templatePackage){
+        // 判断是否有模板存在
+        const packagePath = templatePackage.cachePackagePath
+        const templatePath = path.resolve(packagePath,"template")
+        log.verbose("模块缓存路径",packagePath)
+        log.verbose("模板路径",templatePath)
+        if(!fse.existsSync(templatePath)){
+            throw new Error("模块内不存在模板目录！")
+        }
+        
+        const spinner = spinnerStart("正在安装标准模板...")
+        
+        // 将文件复制到当前目录
+        fse.copySync(templatePath,process.cwd())
+
+        spinner.stop(true)
+        
+        // 对模板中的变量进行替换
+        await this.renderTemplateValiable(projectInfo)
+    }
+
+    // 安装自定义模板
+    async installCustomTemplate(templatePackage){
+        log.verbose("自定义模板安装",templatePackage)
+    }
+
+    async renderTemplateValiable(projectInfo){
+        const spinner = spinnerStart("正在替换模板变量...")
+        const workPath = process.cwd()
+        return new Promise((resolve,reject)=>{
+            glob("**",{
+                cwd:workPath,
+                ignore:["node_modules/**","public/**"],
+                nodir:true
+            },(err,matches)=>{
+                if(err){
+                    spinner.stop(true)
+                    log.error("替换模板变量失败！")
+                    reject(err)
+                }
+                Promise.all(matches.map(filePath=>{
+                    return new Promise((resolve,reject)=>{
+                        const fileCurrentPath = path.resolve(workPath,filePath)
+                        ejs.renderFile(fileCurrentPath,{
+                            ...projectInfo,
+                            appName:"test",
+                            initPackageName:"hello world"
+                        },{}).then((renderedFile)=>{
+                            fse.writeFile(fileCurrentPath,renderedFile)
+                            resolve(renderedFile)
+                        }).catch(err=>{
+                            reject(err)
+                        })
+                    })
+                })).then(()=>{
+                    spinner.stop(true)
+                    log.success("替换模板变量成功！")
+                    resolve()
+                }).catch((err)=>{
+                    spinner.stop(true)
+                    log.error("替换模板变量失败！")
+                    reject(err)
+                })
+            })
+        })
     }
 }
 
