@@ -43,6 +43,8 @@ class InitCommand extends Command {
             log.verbose("projectInfo",projectInfo)
             
             const templatePackage = await this.downloadTemplate(projectInfo)
+            log.verbose("templatePackage",templatePackage)
+            
             await this.installTemplate(projectInfo,templatePackage)
         } catch (error) {
             log.error(error.message)
@@ -214,7 +216,6 @@ class InitCommand extends Command {
 
     // 安装模板
     async installTemplate(projectInfo,templatePackage){
-        log.verbose(templatePackage.packageConfig.type)
         // 普通模板安装
         if(projectInfo.template.type === TEMPLATE_TYPE_NORMAL){
             await this.installNormalTemplate(projectInfo,templatePackage)
@@ -227,6 +228,7 @@ class InitCommand extends Command {
 
     // 安装普通模板
     async installNormalTemplate(projectInfo,templatePackage){
+        log.verbose("自定义模板安装",templatePackage)
         // 判断是否有模板存在
         const packagePath = templatePackage.cachePackagePath
         const templatePath = path.resolve(packagePath,"template")
@@ -262,6 +264,8 @@ class InitCommand extends Command {
             }else{
                 log.success("依赖安装成功！")
             }
+        }else{
+            throw new Error("无依赖安装命令:installCommand")
         }
 
         // 是否有启动命令
@@ -277,12 +281,40 @@ class InitCommand extends Command {
             if(ret!==0){
                 throw new Error("启动本地服务失败！")
             }
+        }else{
+            throw new Error("无本地服务启动命令:serveCommand")
         }
     }
 
     // 安装自定义模板
-    async installCustomTemplate(templatePackage){
-        log.verbose("自定义模板安装",templatePackage)
+    async installCustomTemplate(projectInfo,templatePackage){
+        // 查找项目中根执行文件
+        const rootFile = templatePackage.getRootFilePath()
+        if(!fse.existsSync(rootFile)){
+            throw new Error("没有执行文件,请检查模板模块")
+        }
+        const packagePath = templatePackage.cachePackagePath
+        const templatePath = path.resolve(packagePath,"template")
+        if(!fse.existsSync(templatePath)){
+            throw new Error("没有模板文件,请检查模板模块")
+        }
+        const options = {
+            projectInfo,
+            targetPath:process.cwd(),
+            templatePath:templatePath
+        }
+        const code = `require('${rootFile}')(${JSON.stringify(options)})`
+        try{
+            await execCommandAsync("node",["-e",code],{
+                cwd:process.cwd(),
+                stdio:"inherit"
+            })
+            log.success("自定义模板安装成功!")
+        }catch(err){
+            log.verbose("自定义模板安装错误",err)
+            throw new Error(err.message)
+        }
+        
     }
 
     async renderTemplateValiable(projectInfo){
@@ -302,11 +334,7 @@ class InitCommand extends Command {
                 Promise.all(matches.map(filePath=>{
                     return new Promise((resolve,reject)=>{
                         const fileCurrentPath = path.resolve(workPath,filePath)
-                        ejs.renderFile(fileCurrentPath,{
-                            ...projectInfo,
-                            appName:projectInfo.name,
-                            initPackageName:projectInfo.name
-                        },{}).then((renderedFile)=>{
+                        ejs.renderFile(fileCurrentPath,projectInfo,{}).then((renderedFile)=>{
                             fse.writeFile(fileCurrentPath,renderedFile)
                             resolve(renderedFile)
                         }).catch(err=>{
