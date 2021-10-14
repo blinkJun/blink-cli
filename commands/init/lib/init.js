@@ -2,7 +2,7 @@
 const Command = require("@blink-cli/command")
 const Package = require("@blink-cli/package")
 const log = require("@blink-cli/log")
-const {isCwdEmpty,spinnerStart} = require("@blink-cli/utils")
+const {isCwdEmpty,spinnerStart,execCommandAsync} = require("@blink-cli/utils")
 const inquirer = require("inquirer")
 const fse = require("fs-extra")
 const semver = require("semver")
@@ -245,6 +245,39 @@ class InitCommand extends Command {
         
         // 对模板中的变量进行替换
         await this.renderTemplateValiable(projectInfo)
+
+        const {installCommand,serveCommand} = projectInfo.template
+        // 是否有安装命令
+        if(installCommand){
+            log.notice("开始依赖安装")
+            const args = installCommand.split(" ")
+            const command = args[0]
+            const commandArgs = args.slice(1)
+            const ret = await execCommandAsync(command,commandArgs,{
+                cwd:process.cwd(),
+                stdio:"inherit"
+            })
+            if(ret!==0){
+                throw new Error("安装依赖失败！")
+            }else{
+                log.success("依赖安装成功！")
+            }
+        }
+
+        // 是否有启动命令
+        if(serveCommand){
+            log.notice("开始启动本地服务")
+            const args = serveCommand.split(" ")
+            const command = args[0]
+            const commandArgs = args.slice(1)
+            const ret = await execCommandAsync(command,commandArgs,{
+                cwd:process.cwd(),
+                stdio:"inherit"
+            })
+            if(ret!==0){
+                throw new Error("启动本地服务失败！")
+            }
+        }
     }
 
     // 安装自定义模板
@@ -271,8 +304,8 @@ class InitCommand extends Command {
                         const fileCurrentPath = path.resolve(workPath,filePath)
                         ejs.renderFile(fileCurrentPath,{
                             ...projectInfo,
-                            appName:"test",
-                            initPackageName:"hello world"
+                            appName:projectInfo.name,
+                            initPackageName:projectInfo.name
                         },{}).then((renderedFile)=>{
                             fse.writeFile(fileCurrentPath,renderedFile)
                             resolve(renderedFile)
