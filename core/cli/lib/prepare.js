@@ -18,7 +18,6 @@ async function checkCliVersion() {
     const { getNpmLatestVersion } = require("@blink-cli/get-npm-info")
     try {
         const latestVersion = await getNpmLatestVersion(name, version)
-        log.info(latestVersion)
 
         // 最新版本大于当前版本则建议更新
         if (latestVersion && semver.gt(latestVersion, version)) {

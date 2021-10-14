@@ -7,7 +7,7 @@ const log = require("@blink-cli/log")
 // 执行命令 对应的 模块
 const commands = {
     init: {
-        name: "foo",
+        name: "@blink-cli/init",
         version: "latest"
     }
 }

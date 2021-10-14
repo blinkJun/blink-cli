@@ -22,8 +22,10 @@ async function exec(packageConfig,...args) {
             packageConfig
         })
         if(await pkg.exists()){
+            log.notice("exec","开始更新命令模块")
             await pkg.update()
         }else{
+            log.notice("exec","开始安装命令模块")
             await pkg.install()
         }
     }
