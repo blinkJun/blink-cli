@@ -1,5 +1,5 @@
 {
-  "name": "tinyimg",
+  "name": "@blink-cli/tinyimg",
   "version": "0.2.1",
   "description": "tiny images",
   "keywords": [
@@ -27,8 +27,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@blink-cli/command": "file:../../models/command",
-    "@blink-cli/log": "file:../../utils/log",
+    "@blink-cli/command": "^0.2.0",
+    "@blink-cli/log": "^0.2.0",
     "colors": "^1.4.0"
-  }
+  },
+  "gitHead": "dfda68ca7f325851e2c81b40d9c7588d76b71bf7"
 }
