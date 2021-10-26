@@ -6,6 +6,8 @@ const https = require("https")
 const path = require("path")
 const fs =require("fs")
 
+const colors = require("colors/safe")
+
 // 最低node版本
 const LOWEST_NODE_VERSION = "12.0.0"
 const MAX_SIZE = 5000000
@@ -102,10 +104,11 @@ class TinyImgCommand extends Command{
                     if (err) {
                         return log.error(err.message)
                     }
-                    const origin = `${(info.input.size / 1024).toFixed(2)}KB`
-                    const compress = `${(info.output.size / 1024).toFixed(2)}KB`
-                    const percent = `${((1 - info.output.ratio) * 100).toFixed(2)}%`
-                    log.success(`${entryImgPath}：${origin} => ${compress} (${percent})`)
+                    const path = colors.bold(entryImgPath)
+                    const origin = colors.gray(`${(info.input.size / 1024).toFixed(2)}KB`)
+                    const compress = colors.green(`${(info.output.size / 1024).toFixed(2)}KB`)
+                    const percent = colors.yellow(`${((1 - info.output.ratio) * 100).toFixed(2)}%`)
+                    log.success(`${path}：${origin} => ${compress} (${percent})`)
                 })
             })
         })

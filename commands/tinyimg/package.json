@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@blink-cli/command": "file:../../models/command",
-    "@blink-cli/log": "file:../../utils/log"
+    "@blink-cli/log": "file:../../utils/log",
+    "colors": "^1.4.0"
   }
 }
