@@ -1,0 +1,33 @@
+{
+  "name": "tinyimg",
+  "version": "0.1.2",
+  "description": "tiny images",
+  "keywords": [
+    "tinypng"
+  ],
+  "author": "liangjun <530080147@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/tinyimg.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "http://192.168.1.108:4873/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/blinkjun/blink-cli.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "@blink-cli/command": "file:../../models/command",
+    "@blink-cli/log": "file:../../utils/log"
+  }
+}

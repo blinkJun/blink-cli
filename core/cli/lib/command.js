@@ -9,6 +9,10 @@ const commands = {
     init: {
         name: "@blink-cli/init",
         version: "latest"
+    },
+    tinyimg:{
+        name: "@blink-cli/tinyimg",
+        version: "latest"
     }
 }
 
@@ -52,6 +56,19 @@ function registerCommands() {
         .action(function (...args) {
             const exec = require("@blink-cli/exec")
             exec(commands["init"], ...args)
+        })
+
+    // 注册命令
+    // 命令2：压缩图片
+    program
+        .command("tinyimg")
+        .argument("[entryPath]","指定目录")
+        .argument("[outputPath]","输出目录")
+        .description("压缩图片，支持jpg、png")
+        .option("--deep", "是否递归查找目录中的图片文件", false)
+        .action(function (...args) {
+            const exec = require("@blink-cli/exec")
+            exec(commands["tinyimg"], ...args)
         })
 
     // 监听所有的命令，对未知的命令进行提示
