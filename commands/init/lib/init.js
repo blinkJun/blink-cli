@@ -91,13 +91,12 @@ class InitCommand extends Command {
         if(templates.length<=0){
             throw new Error("暂无项目模板")
         }
-
         const projectInfo = await inquirer.prompt([
             {
                 type:"input",
                 name:"name",
                 message:"请输入项目名称",
-                default:this.packageName,
+                default:this.packageName||"demo",
                 validate:function(value){
                     const done = this.async()
                     setTimeout(()=>{
@@ -228,7 +227,7 @@ class InitCommand extends Command {
 
     // 安装普通模板
     async installNormalTemplate(projectInfo,templatePackage){
-        log.verbose("自定义模板安装",templatePackage)
+        log.verbose("普通模板安装",templatePackage)
         // 判断是否有模板存在
         const packagePath = templatePackage.cachePackagePath
         const templatePath = path.resolve(packagePath,"template")
@@ -288,6 +287,7 @@ class InitCommand extends Command {
 
     // 安装自定义模板
     async installCustomTemplate(projectInfo,templatePackage){
+        log.verbose("自定义模板安装",templatePackage)
         // 查找项目中根执行文件
         const rootFile = templatePackage.getRootFilePath()
         if(!fse.existsSync(rootFile)){

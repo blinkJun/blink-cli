@@ -43,6 +43,7 @@ function registerCommands() {
         .option("-tp, --targetPath <targetPath>", "使用本地模块执行此命令", null)
         .on("option:targetPath", () => {
             const { targetPath } = program.opts()
+            //  D:\blinkJun\blink-cli\commands\init
             process.env.CLI_TARGET_PATH = targetPath
         })
 
