@@ -19,6 +19,14 @@ const templates = [
         type: TEMPLATE_TYPE_COSTUM,
         installCommand: "npm install --registry=http://registry.npm.taobao.org/",
         serveCommand: "npm run serve"
+    },
+    {
+        name: "大也-后台模板",
+        npmName: "@blink-daye/template-console",
+        version: "latest",
+        type: TEMPLATE_TYPE_COSTUM,
+        installCommand: "npm install --registry=http://registry.npm.taobao.org/",
+        serveCommand: "npm run serve"
     }
 ]
 
