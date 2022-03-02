@@ -27,6 +27,14 @@ const templates = [
         type: TEMPLATE_TYPE_COSTUM,
         installCommand: "npm install --registry=http://registry.npm.taobao.org/",
         serveCommand: "npm run serve"
+    },
+    {
+        name: "大也-移动端模板",
+        npmName: "@blink-daye/template-mobile",
+        version: "latest",
+        type: TEMPLATE_TYPE_COSTUM,
+        installCommand: "npm install --registry=http://registry.npm.taobao.org/",
+        serveCommand: "npm run start"
     }
 ]
 
