@@ -35,6 +35,14 @@ const templates = [
         type: TEMPLATE_TYPE_COSTUM,
         installCommand: "npm install --registry=http://registry.npm.taobao.org/",
         serveCommand: "npm run start"
+    },
+    {
+        name: "大也-小程序模板",
+        npmName: "@blink-daye/template-miniprogram",
+        version: "latest",
+        type: TEMPLATE_TYPE_COSTUM,
+        installCommand: "npm install --registry=http://registry.npm.taobao.org/",
+        serveCommand: "npm run start"
     }
 ]
 
