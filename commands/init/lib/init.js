@@ -96,7 +96,7 @@ class InitCommand extends Command {
                 type: "input",
                 name: "name",
                 message: "请输入项目名称",
-                default: this.packageName || path.parse(process.cwd()).dir,
+                default: this.packageName || path.parse(process.cwd()).name,
                 validate: function (value) {
                     const done = this.async()
                     setTimeout(() => {
